@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sticky Note - Content Collection System</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sticky-note-root"></div>
+    <script type="module">
+      import React from 'react';
+      import { createRoot } from 'react-dom/client';
+      import StickyNote from './app/routes/sticky-note.tsx';
+      import './app/globals.css';
+
+      const root = createRoot(document.getElementById('sticky-note-root'));
+      root.render(React.createElement(StickyNote));
+    </script>
+  </body>
+</html>
