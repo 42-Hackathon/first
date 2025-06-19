@@ -2,8 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/header";
 import { EnhancedSidebar } from "@/components/layout/enhanced-sidebar";
-import { EnhancedContentGrid } from "@/components/content/enhanced-content-grid";
-import { MemoSidebar } from "@/components/memo/memo-sidebar";
+import { DraggableContentGrid } from "@/components/content/draggable-content-grid";
+import { EnhancedMemoSidebar } from "@/components/memo/enhanced-memo-sidebar";
 import { SearchModal } from "@/components/search/search-modal";
 import { CollabPanel } from "@/components/collaboration/collab-panel";
 import { MonacoWorkspace } from "@/components/editor/monaco-workspace";
@@ -152,7 +152,7 @@ export default function Index() {
             onToggleCollapse={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
           />
           
-          <EnhancedContentGrid
+          <DraggableContentGrid
             items={filteredItems}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -162,7 +162,7 @@ export default function Index() {
           />
 
           {isRightSidebarOpen ? (
-            <MemoSidebar 
+            <EnhancedMemoSidebar 
               isOpen={isRightSidebarOpen}
               onClose={() => setIsRightSidebarOpen(false)}
               mode={memoMode}
