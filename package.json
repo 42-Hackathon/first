@@ -78,7 +78,7 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@vitejs/plugin-react": "latest",
+    "@vitejs/plugin-react": "^4.5.2",
     "autoprefixer": "latest",
     "concurrently": "latest",
     "electron-builder": "latest",
@@ -90,7 +90,7 @@
     "tailwindcss": "latest",
     "typescript": "latest",
     "typescript-eslint": "latest",
-    "vite": "^6.3.5",
+    "vite": "latest",
     "wait-on": "latest"
   }
 }
