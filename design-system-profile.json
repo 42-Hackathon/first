@@ -1,0 +1,135 @@
+{
+  "designSystemProfile": {
+    "name": "Apple Material-Based Design (Liquid Glass)",
+    "description": "A comprehensive design system profile based on Apple's Human Interface Guidelines, particularly for macOS, iOS, and visionOS. It codifies the principles of using Materials, depth, vibrancy, and interaction to create intuitive, dimensional UIs. This profile is optimized for AI-driven code generation, containing principles, implementation patterns, and interaction models.",
+    "styleProfile": {
+      "name": "Dimensional Material-Based Design",
+      "description": "This style defines a system of 'Materials' that create a sense of physical depth and context. It relies on layering, realistic lighting, and vibrancy to ensure content is always legible and feels tangible.",
+      "keyPrinciples": [
+        {
+          "name": "Depth through Layering",
+          "description": "The UI is built on a Z-axis. Layered Materials create a visual hierarchy. Soft shadows and subtle highlights enhance this perception of depth. Use ZStack in SwiftUI for layering."
+        },
+        {
+          "name": "System Materials",
+          "description": "Use a range of predefined 'Materials' (e.g., .regular, .thin, .thick) which have specific levels of translucency and blur, and automatically adapt to light/dark modes and accessibility settings."
+        },
+        {
+          "name": "Vibrancy",
+          "description": "A critical effect where foreground elements (text, symbols) pull color from the background behind the Material. This maintains high contrast and legibility while creating a harmonious look."
+        },
+        {
+          "name": "Dynamic Lighting and Shadow",
+          "description": "Surfaces simulate a physical presence. They cast soft, diffuse shadows to create depth. On platforms like visionOS, they exhibit specular highlights that shift with the user's perspective, reinforcing the 'glass' metaphor."
+        },
+        {
+          "name": "Platform Adaptability",
+          "description": "While core principles are shared, the design adapts to platform-specific conventions. For example, modals on iOS are typically full-screen sheets, while on macOS they are centered windows."
+        },
+        {
+          "name": "Continuous Corner Radii",
+          "description": "All containers use continuous rounded corners (e.g., `RoundedRectangle(cornerRadius: 20, style: .continuous)` in SwiftUI) for a soft, modern aesthetic."
+        }
+      ]
+    },
+    "colorSystem": {
+      "philosophy": "Color is applied through Materials and Vibrancy, not static hex codes. The system is adaptive by default.",
+      "materials": [
+        {
+          "name": "ThickMaterial",
+          "description": "High blur, low transparency. Obscures background for focus. (e.g., SwiftUI's `.ultraThickMaterial`)"
+        },
+        {
+          "name": "RegularMaterial",
+          "description": "Standard choice, balancing translucency and legibility. (e.g., SwiftUI's `.regularMaterial`)"
+        },
+        {
+          "name": "ThinMaterial",
+          "description": "More transparent, less blur. Reveals more background context. (e.g., SwiftUI's `.thinMaterial`)"
+        }
+      ],
+      "vibrancy": {
+        "primary": "For primary text and symbols.",
+        "secondary": "For less prominent labels and glyphs.",
+        "tertiary": "For disabled or hint text."
+      },
+      "palettes": {
+        "accent-primary": "System Blue (`Color.accentColor`)",
+        "selection-overlay": "A semi-transparent grey or accent color overlay to indicate selection."
+      }
+    },
+    "interactionModel": {
+      "states": [
+        {
+          "name": "Selected",
+          "description": "Indicates the currently active or selected item in a list or collection. Often visualized by applying a `selection-overlay` material or a distinct shape around the item.",
+          "swiftuiExample": ".listRowBackground(item == selection ? Color.accentColor.opacity(0.3) : Color.clear)"
+        },
+        {
+          "name": "Hover",
+          "description": "Provides visual feedback when a pointer is over an interactive element. Typically a subtle change, like a faint overlay or slight scale increase.",
+          "swiftuiExample": ".onHover { isHovering in self.isHovering = isHovering }"
+        }
+      ],
+      "motion": [
+        {
+          "name": "Purposeful Animation",
+          "description": "Animations should be intentional, guiding the user and providing context. Avoid gratuitous motion. Use SwiftUI's `.animation(.default, value: someState)` modifier for implicit animations."
+        },
+        {
+          "name": "Fluid Transitions",
+          "description": "When views appear or disappear, they should use a smooth transition, such as a combination of opacity and scale (`.transition(.opacity.combined(with: .scale))`). Spring animations are preferred for a natural feel."
+        }
+      ]
+    },
+    "implementationPatterns": {
+      "swiftui": [
+        {
+          "pattern": "Layering with ZStack",
+          "description": "Use `ZStack` to place elements on top of each other, perfect for material backgrounds."
+        },
+        {
+          "pattern": "Applying Materials",
+          "description": "Use the `.background()` modifier with a system material and a `ShapeStyle`."
+        },
+        {
+          "pattern": "Component Structure",
+          "description": "Build complex components by composing simple views. For example, a card can be a `VStack` with padding, a material background, and a subtle shadow.",
+          "codeExample": "VStack { ... }.padding().background(.regularMaterial).cornerRadius(20).shadow(radius: 5)"
+        }
+      ]
+    },
+    "accessibility": {
+      "guidelines": [
+        {
+          "name": "Respect 'Reduce Transparency'",
+          "description": "System materials automatically become opaque when this is enabled."
+        },
+        {
+          "name": "Ensure Contrast",
+          "description": "Use the Accessibility Inspector to verify contrast ratios, especially with vibrancy."
+        },
+        {
+          "name": "Support Dynamic Type",
+          "description": "Use standard font styles like `.title` and `.body` to ensure text scales correctly."
+        }
+      ]
+    },
+    "aiReplicationGuide": {
+      "promptingTips": [
+        "For interactive elements: 'Create a SwiftUI list item that shows a selection state. When a `selection` property matches the item's ID, apply a `.background(.selection)` effect.'",
+        "For animation: 'When the view appears, it should animate in with a gentle spring animation, transitioning from an opacity of 0 and a scale of 0.95 to full visibility.'",
+        "Be specific about states: 'The button should scale up slightly to 1.05 on hover.'"
+      ],
+      "coreAttributesForAI": {
+        "swiftui": {
+          "background": ".background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))",
+          "animation": ".animation(.spring(), value: someStateValue)",
+          "transition": ".transition(.opacity.combined(with: .scale))",
+          "shadow": ".shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)"
+        }
+      },
+      "customizationInstructions": "Instruct the AI to create modular components. For example, ask for a `CardView(title: String, caption: String)` that encapsulates the styling, making it reusable. Specify the material type for each requested surface to maintain a clear visual hierarchy."
+    }
+  }
+} 
