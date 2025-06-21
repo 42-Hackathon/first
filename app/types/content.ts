@@ -2,7 +2,7 @@ export interface ContentItem {
   id: string;
   title: string;
   content: string;
-  type: 'text' | 'image' | 'link' | 'file';
+  type: 'text' | 'image' | 'link' | 'file' | 'video';
   stage: 'review' | 'refine' | 'consolidate';
   tags: string[];
   folderId?: string;
@@ -13,6 +13,7 @@ export interface ContentItem {
     fileSize?: number;
     dimensions?: { width: number; height: number };
     author?: string;
+    views?: number;
   };
 }
 

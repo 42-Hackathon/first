@@ -3,13 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, 
   Send, 
-  Paperclip, 
-  Smile,
   MoreVertical,
-  Bot,
-  User
+  Bot
 } from "lucide-react";
-import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -77,29 +73,29 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
           
           {/* Chat Panel */}
           <motion.div
-            initial={{ x: -400 }}
+            initial={{ x: 384 }}
             animate={{ x: 0 }}
-            exit={{ x: -400 }}
+            exit={{ x: 384 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed left-0 top-0 h-full w-96 z-50"
+            className="fixed right-0 top-0 h-full w-96 z-50 p-3"
           >
-            <GlassCard className="h-full m-4 flex flex-col">
+            <div className="h-full w-full flex flex-col bg-zinc-100/60 dark:bg-zinc-900/60 backdrop-blur-xl border-l border-black/10 dark:border-white/10 rounded-2xl overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/20">
+              <div className="flex items-center justify-between p-4 border-b border-black/10 dark:border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center">
                     <Bot className="h-4 w-4 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-white font-medium">AI Assistant</h2>
-                    <p className="text-white/60 text-xs">Online</p>
+                    <h2 className="text-zinc-800 dark:text-zinc-200 font-medium">AI Assistant</h2>
+                    <p className="text-zinc-500 dark:text-zinc-400 text-xs">Online</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-white hover:bg-white/10 h-8 w-8"
+                    className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 h-8 w-8 rounded-lg"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </Button>
@@ -107,7 +103,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
                     variant="ghost"
                     size="icon"
                     onClick={onClose}
-                    className="text-white hover:bg-white/10 h-8 w-8"
+                    className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 h-8 w-8 rounded-lg"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -120,29 +116,21 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
                   {messages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`flex gap-3 ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}
+                      className={`flex gap-3 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        msg.sender === 'user' 
-                          ? 'bg-gradient-to-br from-green-400 to-blue-600' 
-                          : 'bg-gradient-to-br from-blue-400 to-purple-600'
-                      }`}>
-                        {msg.sender === 'user' ? (
-                          <User className="h-4 w-4 text-white" />
-                        ) : (
-                          <Bot className="h-4 w-4 text-white" />
-                        )}
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center order-1 bg-gradient-to-br from-blue-400 to-purple-600">
+                        {msg.sender === 'ai' && <Bot className="h-4 w-4 text-white" />}
                       </div>
-                      <div className={`flex-1 ${msg.sender === 'user' ? 'text-right' : ''}`}>
-                        <div className={`inline-block p-3 rounded-lg max-w-[80%] ${
+                      <div className={`max-w-[80%] ${msg.sender === 'user' ? 'order-0 text-right' : 'order-1'}`}>
+                        <div className={`inline-block p-3 rounded-xl ${
                           msg.sender === 'user'
                             ? 'bg-blue-500 text-white'
-                            : 'bg-white/10 text-white'
+                            : 'bg-black/5 dark:bg-white/5 text-zinc-800 dark:text-zinc-200'
                         }`}>
-                          <p className="text-sm">{msg.content}</p>
+                          <p className="text-sm text-left">{msg.content}</p>
                         </div>
-                        <p className="text-white/50 text-xs mt-1">
-                          {msg.timestamp.toLocaleTimeString()}
+                        <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-1">
+                          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
@@ -151,39 +139,25 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
               </ScrollArea>
 
               {/* Input */}
-              <div className="p-4 border-t border-white/20">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-white/10 h-8 w-8"
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
+              <div className="p-4 border-t border-black/10 dark:border-white/10">
+                <div className="relative">
                   <Input
                     placeholder="Type a message..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                    className="pl-4 pr-10 h-12 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-500 dark:placeholder:text-zinc-400 rounded-xl"
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:bg-white/10 h-8 w-8"
-                  >
-                    <Smile className="h-4 w-4" />
-                  </Button>
                   <Button
                     onClick={handleSendMessage}
                     size="icon"
-                    className="bg-blue-500 hover:bg-blue-600 h-8 w-8"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-blue-500 hover:bg-blue-600 h-8 w-8 rounded-lg"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           </motion.div>
         </>
       )}

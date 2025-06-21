@@ -2,65 +2,106 @@ import { motion } from "framer-motion";
 import { 
   Search, 
   Settings,
-  Minimize2,
-  Maximize2,
-  X,
   StickyNote,
-  Users,
-  Sparkles
+  Sparkles,
+  Minus,
+  Square,
+  X,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ContentItem } from "@/types/content";
 
 interface HeaderProps {
   onSearchToggle: () => void;
   onStickyNoteToggle: () => void;
-  onCollabToggle: () => void;
-  onRightSidebarToggle: () => void;
-  isCollabActive: boolean;
-  isRightSidebarOpen: boolean;
+  zoomLevel: number;
+  openTabs: ContentItem[];
+  activeTabId: string | null;
+  onTabChange: (tabId: string) => void;
+  onTabClose: (tabId: string) => void;
 }
 
 export function Header({ 
   onSearchToggle, 
   onStickyNoteToggle,
-  onCollabToggle,
-  onRightSidebarToggle,
-  isCollabActive,
-  isRightSidebarOpen
+  zoomLevel,
+  openTabs,
+  activeTabId,
+  onTabChange,
+  onTabClose,
 }: HeaderProps) {
+  const scale = (base: number) => base * (zoomLevel / 100);
+
   return (
     <motion.div
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="flex items-center h-12 backdrop-blur-2xl bg-black/20 border-b border-white/10 relative overflow-hidden"
+      className="flex items-center border-b bg-zinc-100/60 dark:bg-zinc-900/60 backdrop-blur-xl border-black/10 dark:border-white/10"
+      style={{ height: `${scale(40)}px`}}
     >
-      {/* Enhanced Glass Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5" />
-      <div className="absolute inset-0 backdrop-blur-3xl bg-black/10" />
-      
-      {/* Subtle glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5" />
-      
       <div className="relative z-10 flex items-center w-full">
         {/* Left - App Title & Navigation */}
         <div className="flex-1 flex items-center">
-          <div className="w-72 flex items-center px-4 border-r border-white/10">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-blue-400 to-purple-600 rounded-md flex items-center justify-center">
-                <Sparkles className="h-3.5 w-3.5 text-white" />
+          <div 
+            className="w-72 flex items-center border-r border-black/10 dark:border-white/10"
+            style={{ paddingLeft: `${scale(16)}px`, paddingRight: `${scale(16)}px`, height: '100%' }}
+          >
+            <div className="flex items-center" style={{ columnGap: `${scale(8)}px`}}>
+              <div 
+                className="bg-gradient-to-br from-blue-400 to-purple-600 rounded-md flex items-center justify-center"
+                style={{
+                  width: `${scale(24)}px`,
+                  height: `${scale(24)}px`,
+                }}
+              >
+                <Sparkles style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} className="text-white" />
               </div>
-              <span className="text-white font-semibold text-sm">Knowledge Hub</span>
+              <span 
+                className="font-semibold text-zinc-800 dark:text-zinc-200"
+                style={{ fontSize: `${scale(14)}px`}}
+              >
+                FLux
+              </span>
             </div>
           </div>
           
-          {/* Workspace indicator */}
-          <div className="flex-1 flex items-center px-3">
-            <div className="bg-white/10 rounded-lg px-3 py-1.5 text-white text-xs backdrop-blur-xl border border-white/20 hover:bg-white/15 transition-all duration-200">
-              <span className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                메인 워크스페이스
-              </span>
-            </div>
+          {/* Tabs */}
+          <div className="flex-1 flex items-end h-full">
+            {openTabs.map(tab => (
+              <div
+                key={tab.id}
+                onClick={() => onTabChange(tab.id)}
+                className={`flex items-center border-r border-black/10 dark:border-white/10 cursor-pointer h-full transition-colors duration-200
+                  ${activeTabId === tab.id 
+                    ? 'bg-white/50 dark:bg-black/20' 
+                    : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5'
+                  }`}
+                style={{
+                  padding: `0 ${scale(12)}px`,
+                }}
+              >
+                <div className="flex items-center" style={{gap: `${scale(6)}px`}}>
+                  <FileText className="text-zinc-500 dark:text-zinc-400" style={{width: `${scale(14)}px`, height: `${scale(14)}px`}} />
+                  <span className="truncate text-zinc-800 dark:text-zinc-200" style={{fontSize: `${scale(12)}px`}}>{tab.title}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation(); // 탭 클릭 이벤트 전파 방지
+                    onTabClose(tab.id);
+                  }}
+                  className="ml-2 rounded-md hover:bg-black/10 dark:hover:bg-white/20 text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  style={{
+                    width: `${scale(18)}px`,
+                    height: `${scale(18)}px`,
+                  }}
+                >
+                  <X style={{width: `${scale(10)}px`, height: `${scale(10)}px`}} />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -70,81 +111,94 @@ export function Header({
             variant="glass" 
             size="sm"
             onClick={onSearchToggle}
-            className="text-white border border-white/30 hover:bg-white/15 backdrop-blur-xl h-8 px-4 text-xs rounded-full relative overflow-hidden group"
+            className="text-zinc-700 dark:text-zinc-300 border border-black/15 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 backdrop-blur-xl rounded-full relative overflow-hidden group"
+            style={{
+              height: `${scale(32)}px`,
+              paddingLeft: `${scale(16)}px`,
+              paddingRight: `${scale(16)}px`,
+              fontSize: `${scale(12)}px`,
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="relative z-10 flex items-center gap-2">
-              <Search className="h-3.5 w-3.5" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="relative z-10 flex items-center" style={{ columnGap: `${scale(8)}px`}}>
+              <Search style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />
               <span>검색하기...</span>
-              <kbd className="pointer-events-none inline-flex h-4 select-none items-center gap-1 rounded border border-white/20 bg-white/10 px-1.5 font-mono text-[10px] font-medium text-white/70 opacity-100">
-                ⌘K
-              </kbd>
             </div>
           </Button>
         </div>
 
         {/* Right - Enhanced Controls */}
-        <div className="flex items-center gap-1 px-4">
-          <Button
-            onClick={onCollabToggle}
-            variant="ghost"
-            size="xs"
-            className={`text-white hover:bg-white/15 h-7 w-7 backdrop-blur-xl transition-all duration-200 ${
-              isCollabActive ? 'bg-white/20 ring-1 ring-white/30' : ''
-            }`}
-            title="실시간 협업"
-          >
-            <Users className="h-3.5 w-3.5" />
-          </Button>
-          
+        <div className="flex items-center px-4" style={{ columnGap: `${scale(8)}px`}}>
           <Button
             onClick={onStickyNoteToggle}
             variant="ghost"
             size="xs"
-            className="text-white hover:bg-white/15 h-7 w-7 backdrop-blur-xl transition-all duration-200"
+            className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl transition-all duration-200 rounded-md flex items-center justify-center"
+            style={{
+              height: `${scale(28)}px`,
+              width: `${scale(28)}px`,
+            }}
             title="스티키 노트"
           >
-            <StickyNote className="h-3.5 w-3.5" />
+            <StickyNote style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />
           </Button>
           
           <Button
             variant="ghost"
             size="xs"
-            className="text-white hover:bg-white/15 h-7 w-7 backdrop-blur-xl transition-all duration-200"
+            className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl transition-all duration-200 rounded-md flex items-center justify-center"
+            style={{
+              height: `${scale(28)}px`,
+              width: `${scale(28)}px`,
+            }}
             title="설정"
           >
-            <Settings className="h-3.5 w-3.5" />
+            <Settings style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />
           </Button>
           
-          <div className="w-px h-5 bg-white/20 mx-1" />
+          <div className="w-px bg-black/10 dark:bg-white/20" style={{ height: `${scale(20)}px`}} />
           
           {/* Window Controls */}
-          <Button
-            variant="ghost"
-            size="xs"
-            className="text-white hover:bg-white/15 h-6 w-6 backdrop-blur-xl transition-all duration-200"
-            title="최소화"
-          >
-            <Minimize2 className="h-3 w-3" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="xs"
-            className="text-white hover:bg-white/15 h-6 w-6 backdrop-blur-xl transition-all duration-200"
-            title="최대화"
-          >
-            <Maximize2 className="h-3 w-3" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="xs"
-            className="text-white hover:bg-white/15 hover:bg-red-500/20 h-6 w-6 backdrop-blur-xl transition-all duration-200"
-            title="닫기"
-          >
-            <X className="h-3 w-3" />
-          </Button>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="xs"
+              className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl transition-all duration-200 flex items-center justify-center rounded-r-none"
+              style={{
+                height: `${scale(28)}px`,
+                width: `${scale(32)}px`,
+              }}
+              title="최소화"
+            >
+              <Minus style={{ width: `${scale(12)}px`, height: `${scale(12)}px` }} />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="xs"
+              className="text-zinc-600 dark:text-zinc-400 hover:bg-black/10 dark:hover:bg-white/10 backdrop-blur-xl transition-all duration-200 flex items-center justify-center rounded-none border-x border-black/10 dark:border-white/10"
+              style={{
+                height: `${scale(28)}px`,
+                width: `${scale(32)}px`,
+              }}
+              title="최대화"
+            >
+              <Square style={{ width: `${scale(10)}px`, height: `${scale(10)}px` }} />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="xs"
+              className="text-zinc-600 dark:text-zinc-400 hover:bg-red-500/80 dark:hover:bg-red-500/50 hover:text-white dark:hover:text-white backdrop-blur-xl transition-all duration-200 flex items-center justify-center rounded-l-none"
+              style={{
+                height: `${scale(28)}px`,
+                width: `${scale(32)}px`,
+              }}
+              title="닫기"
+            >
+              <X style={{ width: `${scale(12)}px`, height: `${scale(12)}px` }} />
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>

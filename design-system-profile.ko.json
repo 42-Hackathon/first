@@ -1,0 +1,105 @@
+{
+  "designSystemProfile": {
+    "name": "Apple 머티리얼 기반 디자인 (리퀴드 글래스) - 최종본",
+    "description": "macOS, iOS, visionOS를 위한 Apple의 Human Interface Guidelines에 기반한 포괄적인 디자인 시스템 프로필입니다. 머티리얼(Materials), 깊이(depth), 생동감(vibrancy), 상호작용(interaction)을 사용하여 직관적이고 입체적인 UI를 만드는 원칙을 체계화합니다. 이 프로필은 원칙, 구현 패턴, 상호작용 모델을 포함하여 AI 기반 코드 생성에 최적화되어 있습니다.",
+    "styleProfile": {
+      "name": "입체적 머티리얼 기반 디자인",
+      "description": "이 스타일은 물리적인 깊이감과 맥락을 생성하는 '머티리얼' 시스템을 정의합니다. 레이어링, 사실적인 조명, 생동감을 활용하여 콘텐츠가 항상 읽기 쉽고 실체감 있게 느껴지도록 보장합니다.",
+      "keyPrinciples": [
+        {
+          "name": "레이어링을 통한 깊이감",
+          "description": "UI는 Z축을 기반으로 구축됩니다. 레이어드된 머티리얼은 시각적 계층 구조를 만듭니다. 부드러운 그림자와 미묘한 하이라이트는 이러한 깊이감을 향상시킵니다. SwiftUI에서는 ZStack을 사용하여 레이어링합니다."
+        },
+        {
+          "name": "시스템 머티리얼",
+          "description": "미리 정의된 다양한 '머티리얼'(예: .regular, .thin, .thick)을 사용합니다. 이들은 특정 수준의 반투명도와 블러를 가지며 라이트/다크 모드 및 접근성 설정에 자동으로 적응합니다."
+        },
+        {
+          "name": "생동감 (Vibrancy)",
+          "description": "전경 요소(텍스트, 심볼)가 머티리얼 뒤의 배경에서 색상을 가져오는 중요한 효과입니다. 이는 높은 대비와 가독성을 유지하면서 조화로운 모습을 만듭니다."
+        },
+        {
+          "name": "동적 조명 및 그림자",
+          "description": "표면은 물리적 존재감을 시뮬레이션합니다. 부드럽고 확산되는 그림자를 드리워 깊이감을 만듭니다. visionOS와 같은 플랫폼에서는 사용자의 시점에 따라 변하는 반사 하이라이트를 보여주어 '유리' 메타포를 강화합니다."
+        },
+        {
+          "name": "플랫폼 적응성",
+          "description": "핵심 원칙은 공유되지만, 디자인은 플랫폼별 관례에 적응합니다. 예를 들어, iOS의 모달은 일반적으로 전체 화면 시트인 반면, macOS에서는 중앙에 위치한 창입니다."
+        },
+        {
+          "name": "연속적인 코너 라운딩",
+          "description": "모든 컨테이너는 부드럽고 현대적인 미학을 위해 연속적인 둥근 모서리(예: SwiftUI의 `RoundedRectangle(cornerRadius: 20, style: .continuous)`)를 사용합니다."
+        }
+      ]
+    },
+    "colorSystem": {
+      "philosophy": "색상은 정적인 헥스 코드가 아닌 머티리얼과 생동감을 통해 적용됩니다. 시스템은 기본적으로 적응형입니다.",
+      "materials": [
+        { "name": "ThickMaterial", "description": "높은 블러, 낮은 투명도. 집중을 위해 배경을 가립니다. (예: SwiftUI의 `.ultraThickMaterial`)" },
+        { "name": "RegularMaterial", "description": "반투명도와 가독성의 균형을 맞춘 표준 선택지. (예: SwiftUI의 `.regularMaterial`)" },
+        { "name": "ThinMaterial", "description": "더 투명하고 블러가 적어 배경 맥락을 더 많이 드러냅니다. (예: SwiftUI의 `.thinMaterial`)" }
+      ],
+      "vibrancy": {
+        "primary": "주 텍스트 및 심볼용.",
+        "secondary": "덜 중요한 레이블 및 글리프용.",
+        "tertiary": "비활성화되었거나 힌트 텍스트용."
+      },
+      "palettes": {
+        "accent-primary": "시스템 블루 (`Color.accentColor`)",
+        "selection-overlay": "선택을 나타내는 반투명 회색 또는 강조 색상 오버레이."
+      }
+    },
+    "interactionModel": {
+      "states": [
+        {
+          "name": "선택됨 (Selected)",
+          "description": "목록이나 컬렉션에서 현재 활성화되거나 선택된 항목을 나타냅니다. 종종 `selection-overlay` 머티리얼이나 항목 주위에 뚜렷한 모양을 적용하여 시각화됩니다.",
+          "swiftuiExample": ".listRowBackground(item == selection ? Color.accentColor.opacity(0.3) : Color.clear)"
+        },
+        {
+          "name": "호버 (Hover)",
+          "description": "포인터가 인터랙티브 요소 위에 있을 때 시각적 피드백을 제공합니다. 일반적으로 희미한 오버레이나 약간의 크기 증가와 같은 미묘한 변경입니다.",
+          "swiftuiExample": ".onHover { isHovering in self.isHovering = isHovering }"
+        }
+      ],
+      "motion": [
+        {
+          "name": "목적 있는 애니메이션",
+          "description": "애니메이션은 의도적이어야 하며, 사용자를 안내하고 맥락을 제공해야 합니다. 불필요한 움직임은 피해야 합니다. 암시적 애니메이션을 위해 SwiftUI의 `.animation(.default, value: someState)` 수정자를 사용합니다."
+        },
+        {
+          "name": "유연한 전환",
+          "description": "뷰가 나타나거나 사라질 때, 투명도와 크기의 조합과 같은 부드러운 전환(`transition(.opacity.combined(with: .scale))`)을 사용해야 합니다. 자연스러운 느낌을 위해 스프링 애니메이션이 선호됩니다."
+        }
+      ]
+    },
+    "implementationPatterns": {
+      "swiftui": [
+        { "pattern": "ZStack으로 레이어링하기", "description": "`ZStack`을 사용하여 요소를 서로 겹쳐 배치하며, 머티리얼 배경에 적합합니다." },
+        { "pattern": "머티리얼 적용하기", "description": "시스템 머티리얼과 `ShapeStyle`과 함께 `.background()` 수정자를 사용합니다." }
+      ]
+    },
+    "accessibility": {
+      "guidelines": [
+        { "name": "'투명도 줄이기' 존중", "description": "이 옵션이 활성화되면 시스템 머티리얼은 자동으로 불투명해집니다." },
+        { "name": "대비 보장", "description": "특히 생동감을 사용할 때 대비 비율을 확인하기 위해 Accessibility Inspector를 사용합니다." },
+        { "name": "동적 타입 지원", "description": "텍스트가 올바르게 확장되도록 `.title` 및 `.body`와 같은 표준 글꼴 스타일을 사용합니다." }
+      ]
+    },
+    "aiReplicationGuide": {
+      "promptingTips": [
+        "인터랙티브 요소의 경우: '선택 상태를 보여주는 SwiftUI 리스트 아이템을 만드세요. `selection` 속성이 아이템의 ID와 일치할 때 `.background(.selection)` 효과를 적용하세요.'",
+        "애니메이션의 경우: '뷰가 나타날 때, 부드러운 스프링 애니메이션으로, 투명도 0과 크기 0.95에서 전체 가시성으로 전환되어야 합니다.'",
+        "상태를 구체적으로 명시하세요: '버튼은 호버 시 1.05로 약간 커져야 합니다.'"
+      ],
+      "coreAttributesForAI": {
+        "swiftui": {
+          "background": ".background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))",
+          "animation": ".animation(.spring(), value: someStateValue)",
+          "transition": ".transition(.opacity.combined(with: .scale))",
+          "shadow": ".shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)"
+        }
+      }
+    }
+  }
+} 
