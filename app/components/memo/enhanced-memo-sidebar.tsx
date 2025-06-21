@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import { 
@@ -312,7 +311,9 @@ export function EnhancedMemoSidebar({
   }
 
   return (
-    <div className="h-full flex flex-col border-l border-white/[0.15] outline-none shadow-none">
+    <div
+      className="h-full flex flex-col border-l border-white/[0.15] w-72 outline-none shadow-none"
+    >
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Apple Liquid Glass Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/[0.15] via-cyan-300/[0.08] to-blue-600/[0.12]" />
@@ -361,8 +362,9 @@ export function EnhancedMemoSidebar({
           </div>
 
           {mode === 'memo' && (
-            <div className="flex-1 flex flex-col p-3 space-y-3 overflow-hidden">
-              <div className="flex-1 overflow-hidden relative">
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Editor Area - 박스 제거 */}
+              <div className="flex-1 overflow-hidden relative p-3">
                 <Editor
                   language={editorLanguage}
                   value={editorContent}
@@ -373,30 +375,53 @@ export function EnhancedMemoSidebar({
                 />
               </div>
               
+              {/* 구분선과 파일 형식 버튼 */}
+              <div className="flex-shrink-0 border-t border-white/[0.15] px-3 py-2">
+                <div className="flex items-center justify-end">
+                  {/* 파일 형식 전환 버튼 */}
+                  <div className="flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5">
+                    <Button
+                      onClick={() => setEditorLanguage('markdown')}
+                      variant={editorLanguage === 'markdown' ? "secondary" : "ghost"}
+                      className={`h-5 px-2 text-xs transition-all duration-200 ${
+                        editorLanguage === 'markdown' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      .md
+                    </Button>
+                    <Button
+                      onClick={() => setEditorLanguage('plaintext')}
+                      variant={editorLanguage === 'plaintext' ? "secondary" : "ghost"}
+                      className={`h-5 px-2 text-xs transition-all duration-200 ${
+                        editorLanguage === 'plaintext' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      .txt
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Pills Drop Zone */}
               <div
                 ref={dropZoneRef}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`flex-shrink-0 rounded-lg p-2 transition-colors duration-200 relative ${
+                className={`flex-shrink-0 p-3 transition-colors duration-200 relative ${
                   isDragging ? "bg-white/10" : ""
                 }`}
               >
                 <div className="flex flex-wrap gap-2">
                   {contentPills.map(pill => (
                     <div key={pill.id} className="group relative">
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      <div
                         className="flex items-center bg-white/10 text-white/90 text-xs rounded-full pl-2 pr-2 py-1 backdrop-blur-xl border border-white/20 cursor-pointer hover:bg-white/20"
                         onClick={() => insertPillIntoEditor(pill)}
                       >
                         <PillIcon type={pill.type} />
                         <span className="truncate max-w-[120px] mx-1">{pill.title}</span>
-                      </motion.div>
+                      </div>
                       <button 
                         onClick={() => removeContentPill(pill.id)}
                         className="absolute -top-1 -right-1 bg-red-500 rounded-full h-4 w-4 flex items-center justify-center text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
@@ -421,29 +446,6 @@ export function EnhancedMemoSidebar({
                <div className="flex-1 rounded-lg text-white/80 text-center flex items-center justify-center">
                 AI 채팅 기능이 여기에 표시됩니다.
                </div>
-            </div>
-          )}
-
-          {mode === 'memo' && (
-            <div className="absolute bottom-1 right-1 flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5 z-30">
-              <Button
-                onClick={() => setEditorLanguage('markdown')}
-                variant={editorLanguage === 'markdown' ? "secondary" : "ghost"}
-                className={`h-5 px-2 text-xs transition-all duration-200 ${
-                  editorLanguage === 'markdown' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
-                }`}
-              >
-                .md
-              </Button>
-              <Button
-                onClick={() => setEditorLanguage('plaintext')}
-                variant={editorLanguage === 'plaintext' ? "secondary" : "ghost"}
-                className={`h-5 px-2 text-xs transition-all duration-200 ${
-                  editorLanguage === 'plaintext' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
-                }`}
-              >
-                .txt
-              </Button>
             </div>
           )}
         </div>

@@ -26,107 +26,50 @@ export default function Index() {
   const [cursorPosition, setCursorPosition] = useState({ lineNumber: 1, column: 1 });
   const [isCollabActive, setIsCollabActive] = useState(false);
 
-  // 좌측 사이드바 리사이즈 상태
-  const leftSidebarWidth = useMotionValue(288);
-  const [isLeftResizing, setIsLeftResizing] = useState(false);
-
-  // 우측 사이드바 리사이즈 상태 - 픽셀 값으로 관리
-  const [rightSidebarWidth, setRightSidebarWidth] = useState(320);
-  const [isRightResizing, setIsRightResizing] = useState(false);
+  const sidebarWidth = useMotionValue(288);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Modal states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [memoMode, setMemoMode] = useState<'memo' | 'chat'>('memo');
 
-  // 좌측 사이드바 리사이즈 핸들러
-  const handleLeftResizeMouseDown = (e: React.MouseEvent) => {
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsLeftResizing(true);
+    setIsResizing(true);
   };
 
-  const handleLeftResizeMouseMove = useCallback((e: MouseEvent) => {
-    if (isLeftResizing) {
+  const handleResizeMouseMove = useCallback((e: MouseEvent) => {
+    if (isResizing) {
       const newWidth = e.clientX;
-      const minWidth = 48;
+      const minWidth = 240;
       const maxWidth = 500;
-      
       if (newWidth >= minWidth && newWidth <= maxWidth) {
-        leftSidebarWidth.set(newWidth);
-        setIsLeftSidebarCollapsed(newWidth < 70);
+        sidebarWidth.set(newWidth);
       }
     }
-  }, [isLeftResizing, leftSidebarWidth]);
+  }, [isResizing, sidebarWidth]);
 
-  const handleLeftResizeMouseUp = useCallback(() => {
-    setIsLeftResizing(false);
+  const handleResizeMouseUp = useCallback(() => {
+    setIsResizing(false);
   }, []);
 
-  // 우측 사이드바 리사이즈 핸들러
-  const handleRightResizeMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsRightResizing(true);
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  };
-
-  const handleRightResizeMouseMove = useCallback((e: MouseEvent) => {
-    if (isRightResizing) {
-      e.preventDefault();
-      const containerWidth = window.innerWidth;
-      const newWidth = containerWidth - e.clientX;
-      const minWidth = 280;
-      const maxWidth = 600;
-      
-      if (newWidth >= minWidth && newWidth <= maxWidth) {
-        setRightSidebarWidth(newWidth);
-      }
-    }
-  }, [isRightResizing]);
-
-  const handleRightResizeMouseUp = useCallback(() => {
-    setIsRightResizing(false);
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-  }, []);
-
-  // 마우스 이벤트 리스너 등록/해제
   useEffect(() => {
-    if (isLeftResizing) {
-      window.addEventListener('mousemove', handleLeftResizeMouseMove);
-      window.addEventListener('mouseup', handleLeftResizeMouseUp);
+    if (isResizing) {
+      window.addEventListener('mousemove', handleResizeMouseMove);
+      window.addEventListener('mouseup', handleResizeMouseUp);
     } else {
-      window.removeEventListener('mousemove', handleLeftResizeMouseMove);
-      window.removeEventListener('mouseup', handleLeftResizeMouseUp);
+      window.removeEventListener('mousemove', handleResizeMouseMove);
+      window.removeEventListener('mouseup', handleResizeMouseUp);
     }
     return () => {
-      window.removeEventListener('mousemove', handleLeftResizeMouseMove);
-      window.removeEventListener('mouseup', handleLeftResizeMouseUp);
+      window.removeEventListener('mousemove', handleResizeMouseMove);
+      window.removeEventListener('mouseup', handleResizeMouseUp);
     };
-  }, [isLeftResizing, handleLeftResizeMouseMove, handleLeftResizeMouseUp]);
+  }, [isResizing, handleResizeMouseMove, handleResizeMouseUp]);
 
-  useEffect(() => {
-    if (isRightResizing) {
-      window.addEventListener('mousemove', handleRightResizeMouseMove);
-      window.addEventListener('mouseup', handleRightResizeMouseUp);
-    } else {
-      window.removeEventListener('mousemove', handleRightResizeMouseMove);
-      window.removeEventListener('mouseup', handleRightResizeMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleRightResizeMouseMove);
-      window.removeEventListener('mouseup', handleRightResizeMouseUp);
-    };
-  }, [isRightResizing, handleRightResizeMouseMove, handleRightResizeMouseUp]);
-
-  const handleLeftResetWidth = () => {
-    animate(leftSidebarWidth, 288, { type: "spring", stiffness: 400, damping: 30 });
-    setIsLeftSidebarCollapsed(false);
-  };
-
-  const handleRightResetWidth = () => {
-    setRightSidebarWidth(320);
+  const handleResetWidth = () => {
+    animate(sidebarWidth, 288, { type: "spring", stiffness: 400, damping: 30 });
   };
 
   const handleItemSelect = (item: ContentItem) => {
@@ -195,6 +138,8 @@ export default function Index() {
     return item.folderId === selectedFolder;
   });
 
+  const isLeftSidebarOpen = sidebarWidth.get() > 70;
+
   return (
     <div 
       className="h-screen w-screen overflow-hidden relative bg-cover bg-center"
@@ -220,12 +165,11 @@ export default function Index() {
         />
         
         <div className="flex-1 flex">
-          {/* 좌측 사이드바 */}
-          <motion.div style={{ width: leftSidebarWidth }}>
+          {isLeftSidebarOpen && (
             <EnhancedSidebar 
-              width={leftSidebarWidth}
-              onResizeMouseDown={handleLeftResizeMouseDown}
-              onResetWidth={handleLeftResetWidth}
+              width={sidebarWidth}
+              onResizeMouseDown={handleResizeMouseDown}
+              onResetWidth={handleResetWidth}
               selectedFolder={selectedFolder}
               onFolderSelect={handleFolderSelect}
               isCollapsed={isLeftSidebarCollapsed}
@@ -237,75 +181,54 @@ export default function Index() {
               onZoomOut={handleZoomOut}
               cursorPosition={cursorPosition}
             />
-          </motion.div>
+          )}
           
-          {/* 메인 콘텐츠 영역 */}
-          <div className="flex-1 flex">
-            {activeTabId ? (
-              <div className="flex-1 p-4">
-                <h1 className="text-2xl font-bold">{openTabs.find(t => t.id === activeTabId)?.title}</h1>
-                <p className="mt-4 whitespace-pre-wrap">{openTabs.find(t => t.id === activeTabId)?.content}</p>
-              </div>
-            ) : (
-              <DraggableContentGrid
-                items={filteredItems}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-                onItemSelect={handleItemSelect}
-                selectedItems={[]}
-                folderName={getFolderName(selectedFolder)}
-                zoomLevel={zoomLevel}
-              />
-            )}
+          {activeTabId ? (
+            <div className="flex-1 p-4">
+              <h1 className="text-2xl font-bold">{openTabs.find(t => t.id === activeTabId)?.title}</h1>
+              <p className="mt-4 whitespace-pre-wrap">{openTabs.find(t => t.id === activeTabId)?.content}</p>
+            </div>
+          ) : (
+            <DraggableContentGrid
+              items={filteredItems}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onItemSelect={handleItemSelect}
+              selectedItems={[]}
+              folderName={getFolderName(selectedFolder)}
+              zoomLevel={zoomLevel}
+            />
+          )}
 
-            {/* 우측 사이드바 */}
-            {isRightSidebarOpen ? (
-              <div 
-                className="relative flex-shrink-0"
-                style={{ width: `${rightSidebarWidth}px` }}
+          {isRightSidebarOpen ? (
+            <EnhancedMemoSidebar 
+              isOpen={isRightSidebarOpen}
+              onClose={() => setIsRightSidebarOpen(false)}
+              mode={memoMode}
+              onModeChange={setMemoMode}
+              zoomLevel={zoomLevel}
+              onCursorChange={(p) => setCursorPosition({lineNumber: p.line, column: p.column})}
+            />
+          ) : (
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="fixed right-4 top-20 z-30"
+            >
+              <Button
+                onClick={() => setIsRightSidebarOpen(true)}
+                variant="glass"
+                size="icon"
+                className="text-white hover:bg-white/15 h-10 w-10 backdrop-blur-xl bg-white/10 border border-white/20 rounded-full relative overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
+                title="사이드바 열기"
               >
-                {/* 우측 사이드바 리사이즈 핸들 - 메인 컴포넌트에서 관리 */}
-                <div
-                  onMouseDown={handleRightResizeMouseDown}
-                  onDoubleClick={handleRightResetWidth}
-                  className={`absolute left-0 top-0 w-2 h-full z-30 group cursor-col-resize ${
-                    isRightResizing ? 'bg-blue-500/70' : 'hover:bg-blue-500/50'
-                  } transition-colors duration-200`}
-                  title="Drag to resize, double-click to reset"
-                >
-                  <div className="w-full h-full" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent rounded-full" />
+                <div className="relative z-10">
+                  <PanelRightOpen className="h-4 w-4" />
                 </div>
-
-                <EnhancedMemoSidebar 
-                  isOpen={isRightSidebarOpen}
-                  onClose={() => setIsRightSidebarOpen(false)}
-                  mode={memoMode}
-                  onModeChange={setMemoMode}
-                  zoomLevel={zoomLevel}
-                  onCursorChange={(p) => setCursorPosition({lineNumber: p.line, column: p.column})}
-                />
-              </div>
-            ) : (
-              <motion.div
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="fixed right-4 top-20 z-30"
-              >
-                <Button
-                  onClick={() => setIsRightSidebarOpen(true)}
-                  variant="glass"
-                  size="icon"
-                  className="text-white hover:bg-white/15 h-10 w-10 backdrop-blur-xl bg-white/10 border border-white/20 rounded-full relative overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
-                  title="사이드바 열기"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent rounded-full" />
-                  <div className="relative z-10">
-                    <PanelRightOpen className="h-4 w-4" />
-                  </div>
-                </Button>
-              </motion.div>
-            )}
-          </div>
+              </Button>
+            </motion.div>
+          )}
         </div>
       </div>
 
