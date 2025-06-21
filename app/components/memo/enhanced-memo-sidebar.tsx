@@ -311,7 +311,9 @@ export function EnhancedMemoSidebar({
   }
 
   return (
-    <div className="h-full flex flex-col outline-none shadow-none w-full">
+    <div
+      className="h-full flex flex-col border-l border-white/[0.15] w-72 outline-none shadow-none"
+    >
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Apple Liquid Glass Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/[0.15] via-cyan-300/[0.08] to-blue-600/[0.12]" />
@@ -361,7 +363,7 @@ export function EnhancedMemoSidebar({
 
           {mode === 'memo' && (
             <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Editor Area */}
+              {/* Editor Area - 박스 제거 */}
               <div className="flex-1 overflow-hidden relative p-3">
                 <Editor
                   language={editorLanguage}
