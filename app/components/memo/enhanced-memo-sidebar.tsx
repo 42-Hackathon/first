@@ -312,13 +312,7 @@ export function EnhancedMemoSidebar({
   }
 
   return (
-    <motion.div
-      className="h-full flex flex-col border-l border-white/[0.15] w-72 outline-none shadow-none"
-      initial={{ x: "100%" }}
-      animate={{ x: 0 }}
-      exit={{ x: "100%" }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-    >
+    <div className="h-full flex flex-col border-l border-white/[0.15] w-full outline-none shadow-none">
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Apple Liquid Glass Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/[0.15] via-cyan-300/[0.08] to-blue-600/[0.12]" />
@@ -454,6 +448,6 @@ export function EnhancedMemoSidebar({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
