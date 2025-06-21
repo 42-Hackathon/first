@@ -8,8 +8,8 @@ let stickyNoteWindow;
 function createWindow() {
   // Create the browser window
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+    width: 1280,
+    height: 800,
     minWidth: 1200,
     minHeight: 700,
     webPreferences: {

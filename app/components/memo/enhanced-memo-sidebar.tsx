@@ -312,25 +312,25 @@ export function EnhancedMemoSidebar({
   }
 
   return (
-    <motion.div
+        <motion.div
       className="h-full flex flex-col border-l border-white/[0.15] w-72 outline-none shadow-none"
       initial={{ x: "100%" }}
-      animate={{ x: 0 }}
+          animate={{ x: 0 }}
       exit={{ x: "100%" }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Apple Liquid Glass Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/[0.15] via-cyan-300/[0.08] to-blue-600/[0.12]" />
         <div className="absolute inset-0 backdrop-blur-3xl" />
         <div className="absolute inset-0 bg-white/[0.03]" />
-        
+          
         {/* Subtle Glass Reflections */}
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/[0.08] to-transparent" />
         <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-gradient-to-tl from-blue-300/[0.05] to-transparent" />
-        
+          
         <div className="relative z-10 flex-1 flex flex-col">
-          {/* Header */}
+            {/* Header */}
           <div className="relative flex items-center justify-between px-3 py-1.5 border-b border-white/[0.15]">
             {/* Collapse button */}
             <Button
@@ -345,24 +345,24 @@ export function EnhancedMemoSidebar({
             
             {/* Mode Switch */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-              <Button
+                <Button
                 variant={mode === 'memo' ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => onModeChange('memo')}
+                  size="sm"
+                  onClick={() => onModeChange('memo')}
                 className="h-7 px-3 text-xs"
-              >
+                >
                 <FileText className="h-3.5 w-3.5 mr-1.5" />
-                메모
-              </Button>
-              <Button
+                  메모
+                </Button>
+                <Button
                 variant={mode === 'chat' ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => onModeChange('chat')}
+                  size="sm"
+                  onClick={() => onModeChange('chat')}
                 className="h-7 px-3 text-xs"
-              >
+                >
                 <MessageCircle className="h-3.5 w-3.5 mr-1.5" />
-                AI
-              </Button>
+                  AI
+                </Button>
             </div>
           </div>
 
@@ -388,18 +388,18 @@ export function EnhancedMemoSidebar({
                   isDragging ? "bg-white/10" : ""
                 }`}
               >
-                <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                   {contentPills.map(pill => (
                     <div key={pill.id} className="group relative">
-                      <motion.div
+                          <motion.div
                         layout
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                         className="flex items-center bg-white/10 text-white/90 text-xs rounded-full pl-2 pr-2 py-1 backdrop-blur-xl border border-white/20 cursor-pointer hover:bg-white/20"
-                        onClick={() => insertPillIntoEditor(pill)}
-                      >
+                            onClick={() => insertPillIntoEditor(pill)}
+                          >
                         <PillIcon type={pill.type} />
                         <span className="truncate max-w-[120px] mx-1">{pill.title}</span>
                       </motion.div>
@@ -409,16 +409,16 @@ export function EnhancedMemoSidebar({
                       >
                         <X className="h-2.5 w-2.5" />
                       </button>
-                    </div>
+                                  </div>
                   ))}
                   {contentPills.length === 0 && (
                      <p className="text-white/50 text-xs text-center w-full py-2">
                       콘텐츠를 이곳으로 드래그 앤 드롭하세요.
                     </p>
-                  )}
-                </div>
-              </div>
-            </div>
+                                )}
+                                </div>
+                              </div>
+                            </div>
           )}
           
           {mode === 'chat' && (
@@ -426,9 +426,9 @@ export function EnhancedMemoSidebar({
                {/* AI Chat UI */}
                <div className="flex-1 rounded-lg text-white/80 text-center flex items-center justify-center">
                 AI 채팅 기능이 여기에 표시됩니다.
-               </div>
-            </div>
-          )}
+                    </div>
+                  </div>
+                )}
 
           {mode === 'memo' && (
             <div className="absolute bottom-1 right-1 flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5 z-30">
@@ -441,19 +441,19 @@ export function EnhancedMemoSidebar({
               >
                 .md
               </Button>
-              <Button
+                    <Button
                 onClick={() => setEditorLanguage('plaintext')}
                 variant={editorLanguage === 'plaintext' ? "secondary" : "ghost"}
                 className={`h-5 px-2 text-xs transition-all duration-200 ${
                   editorLanguage === 'plaintext' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
                 }`}
-              >
+                    >
                 .txt
-              </Button>
-            </div>
+                    </Button>
+                  </div>
           )}
-        </div>
-      </div>
-    </motion.div>
+                </div>
+          </div>
+        </motion.div>
   );
 }

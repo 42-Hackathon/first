@@ -21,20 +21,25 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
-interface EnhancedSidebarProps {
-  width: MotionValue<number>;
-  onResizeMouseDown: (e: React.MouseEvent) => void;
-  onResetWidth: () => void;
+interface BaseSidebarProps {
+  width?: MotionValue<number>;
+  onResizeMouseDown?: (event: MouseEvent | TouchEvent | PointerEvent) => void;
+  onResetWidth?: () => void;
   selectedFolder?: string;
   onFolderSelect: (folderId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
-  isCollabActive: boolean;
-  onCollabToggle: () => void;
-  zoomLevel: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-  cursorPosition: { lineNumber: number; column: number };
+  isCollabActive?: boolean;
+  onCollabToggle?: () => void;
+  zoomLevel?: number;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+
+  // New props to control features
+  isResizable?: boolean;
+  isCollapsible?: boolean;
+  showCollab?: boolean;
+  showZoomControls?: boolean;
 }
 
 interface FolderItem {
@@ -46,7 +51,7 @@ interface FolderItem {
   isExpanded?: boolean;
 }
 
-export function EnhancedSidebar({ 
+export function BaseSidebar({ 
   width,
   onResizeMouseDown,
   onResetWidth,
@@ -56,35 +61,38 @@ export function EnhancedSidebar({
   onToggleCollapse,
   isCollabActive,
   onCollabToggle,
-  zoomLevel,
+  zoomLevel = 100,
   onZoomIn,
   onZoomOut,
-  cursorPosition,
-}: EnhancedSidebarProps) {
+  isResizable = true,
+  isCollapsible = true,
+  showCollab = true,
+  showZoomControls = true
+}: BaseSidebarProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['categories']));
 
   const scale = (base: number) => base * (zoomLevel / 100);
 
   const allContentFolder = {
-      id: 'all',
-      name: '모든 콘텐츠',
-      icon: Archive,
-      count: 1247
+    id: 'all',
+    name: '모든 콘텐츠',
+    icon: Archive,
+    count: 1247
   };
 
   const categoriesFolder = {
-      id: 'categories',
-      name: '카테고리',
-      icon: Folder,
-      count: 0,
-      children: [
+    id: 'categories',
+    name: '카테고리',
+    icon: Folder,
+    count: 0,
+    children: [
       { id: 'text', name: '텍스트 하이라이팅', icon: FileText, count: 456 },
       { id: 'links', name: '링크', icon: Link, count: 234 },
       { id: 'images', name: '이미지', icon: Image, count: 189 },
       { id: 'videos', name: '동영상', icon: Video, count: 67 },
       { id: 'clipboard', name: '클립보드', icon: Clipboard, count: 123 },
       { id: 'screenshots', name: '스크린샷', icon: Camera, count: 178 }
-      ]
+    ]
   };
 
   const userFolders: FolderItem[] = [
@@ -96,7 +104,7 @@ export function EnhancedSidebar({
     }
     // 여기에 실제 로컬 폴더가 동적으로 추가될 예정
   ];
-
+  
   const toggleFolder = (folderId: string) => {
     if (isCollapsed) return;
     
@@ -115,7 +123,7 @@ export function EnhancedSidebar({
     const hasChildren = item.children && item.children.length > 0;
     const isSelected = selectedFolder === item.id;
 
-    if (isCollapsed) {
+    if (isCollapsed && isCollapsible) {
       return (
         <div key={item.id} className="mb-1">
           <Button
@@ -205,7 +213,7 @@ export function EnhancedSidebar({
   return (
     <motion.div
       className={`h-full flex flex-col relative`}
-      style={isCollapsed ? { width: 48 } : { width }}
+      style={isCollapsed && isCollapsible ? { width: 48 } : { width }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div className="flex-1 flex flex-col relative overflow-hidden border-r border-white/[0.15]">
@@ -226,7 +234,7 @@ export function EnhancedSidebar({
               padding: `${scale(6)}px ${scale(12)}px`,
             }}
           >
-            {!isCollapsed && (
+            {!(isCollapsed && isCollapsible) && (
               <h2 
                 className="font-semibold text-white/90"
                 style={{ fontSize: `${scale(14)}px`}}
@@ -234,149 +242,92 @@ export function EnhancedSidebar({
                 폴더
               </h2>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onToggleCollapse}
-              className="text-white/80 hover:text-white hover:bg-white/[0.15] transition-all duration-200 flex items-center justify-center"
-              style={{
-                height: `${scale(24)}px`,
-                width: `${scale(24)}px`,
-              }}
-            >
-              {isCollapsed ? 
-                <PanelLeftOpen style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} /> : 
-                <PanelLeftClose style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />}
-            </Button>
+            {isCollapsible && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleCollapse}
+                className="text-white/80 hover:text-white hover:bg-white/[0.15] transition-all duration-200 flex items-center justify-center"
+                style={{
+                  height: `${scale(24)}px`,
+                  width: `${scale(24)}px`,
+                }}
+              >
+                {isCollapsed ? 
+                  <PanelLeftOpen style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} /> : 
+                  <PanelLeftClose style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />}
+              </Button>
+            )}
           </div>
 
-          {/* Folder Tree */}
+          {/* Main Content */}
           <ScrollArea className="flex-1">
-            <div 
-              className="flex flex-col h-full"
-              style={{
-                padding: isCollapsed ? `${scale(4)}px` : `${scale(8)}px`,
-              }}
-            >
-              <div className="flex-1 space-y-0.5">
-                {renderFolderItem(allContentFolder)}
-                
-                <div 
-                  className="mx-auto bg-white/10"
-                  style={{
-                    height: '1px',
-                    width: isCollapsed ? `${scale(24)}px` : '80%',
-                    margin: `${scale(8)}px auto`,
-                  }}
-                />
-                
-                {userFolders.map(folder => renderFolderItem(folder))}
-              </div>
-
-              <div className="flex-shrink-0">
-                <div 
-                  className="mx-auto bg-white/10"
-                  style={{
-                    height: '1px',
-                    width: isCollapsed ? `${scale(24)}px` : '80%',
-                    margin: `${scale(8)}px auto`,
-                  }}
-                />
-                {renderFolderItem(categoriesFolder)}
-              </div>
+            <div className="p-1" style={{ paddingTop: scale(4), paddingBottom: scale(4)}}>
+              {renderFolderItem(allContentFolder)}
+              <div style={{ height: scale(8) }} />
+              {renderFolderItem(categoriesFolder)}
+              <div style={{ height: scale(8) }} />
+              {userFolders.map(folder => renderFolderItem(folder))}
             </div>
           </ScrollArea>
-
-          {/* Footer section */}
+          
+          {/* Footer */}
           <div 
-            className="flex-shrink-0 border-t border-white/[0.15]"
-            style={{
-              padding: `${scale(8)}px`,
-              rowGap: `${scale(8)}px`,
-            }}
+            className="border-t border-white/[0.15]"
+            style={{ padding: `${scale(8)}px` }}
           >
-            {/* Cloud Storage */}
-            <div className="space-y-1 text-white/70" style={{ fontSize: `${scale(12)}px` }}>
-              <div className="flex justify-between">
-                <span>클라우드 용량</span>
-                <span>15.7 / 50 GB</span>
+            {showCollab && !isCollapsed && (
+              <div className="flex items-center justify-between mb-2">
+                <Button
+                  variant={isCollabActive ? 'secondary' : 'ghost'}
+                  onClick={onCollabToggle}
+                  className="w-full text-white/80 hover:text-white"
+                >
+                  <Users className="mr-2" style={{ width: scale(14), height: scale(14) }}/>
+                  <span style={{ fontSize: scale(12) }}>Collaboration</span>
+                </Button>
               </div>
-              <div className="w-full bg-white/10 rounded-full" style={{ height: `${scale(4)}px` }}>
-                <div 
-                  className="bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full" 
-                  style={{ 
-                    width: `${(15.7/50)*100}%`,
-                    height: `${scale(4)}px`
-                  }}
-                />
-              </div>
-                </div>
-                
-            {/* Controls */}
-            <div className="flex items-center justify-between text-white/70" style={{ fontSize: `${scale(12)}px` }}>
-              {/* Collab Button */}
-              <Button 
-                variant={isCollabActive ? "secondary" : "ghost"}
-                size="icon" 
-                className={`transition-all duration-200 flex items-center justify-center ${
-                  isCollabActive ? 'bg-blue-500/50 text-white' : 'text-white/70 hover:bg-white/10'
-                }`}
-                style={{
-                  width: `${scale(28)}px`,
-                  height: `${scale(28)}px`,
-                }}
-                onClick={onCollabToggle}
-                title="협업 모드"
-              >
-                <Users style={{ width: `${scale(16)}px`, height: `${scale(16)}px` }} />
-              </Button>
-
-              {/* Zoom Controls */}
-              <div className="flex items-center" style={{ columnGap: `${scale(4)}px` }}>
+            )}
+            
+            {showZoomControls && !isCollapsed && (
+              <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
-                  className="flex items-center justify-center rounded-md"
-                  style={{ width: `${scale(24)}px`, height: `${scale(24)}px` }}
+                  size="icon"
                   onClick={onZoomOut}
-                  >
-                  <ZoomOut style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />
-                </Button>
-                <div
-                  className="text-center tabular-nums"
-                  style={{ fontSize: `${scale(11)}px`, width: `${scale(35)}px` }}
+                  className="flex-1 h-auto text-white/80"
+                  style={{ padding: `${scale(4)}px`}}
                 >
-                  {Math.round(zoomLevel)}%
+                  <ZoomOut style={{ width: scale(14), height: scale(14) }} />
+                </Button>
+                <div 
+                  className="text-center text-white/80 cursor-pointer"
+                  style={{ fontSize: scale(11) }}
+                  onClick={onResetWidth}
+                >
+                  {zoomLevel}%
                 </div>
                 <Button
                   variant="ghost"
-                  className="flex items-center justify-center rounded-md"
-                  style={{ width: `${scale(24)}px`, height: `${scale(24)}px` }}
+                  size="icon"
                   onClick={onZoomIn}
+                  className="flex-1 h-auto text-white/80"
+                  style={{ padding: `${scale(4)}px`}}
                 >
-                  <ZoomIn style={{ width: `${scale(14)}px`, height: `${scale(14)}px` }} />
+                  <ZoomIn style={{ width: scale(14), height: scale(14) }} />
                 </Button>
-                </div>
-                
-              {/* Cursor Position */}
-              <div className="text-right">
-                <span>Ln {cursorPosition.lineNumber}, Col {cursorPosition.column}</span>
               </div>
-            </div>
+            )}
           </div>
         </div>
+
+        {isResizable && !isCollapsed && (
+          <motion.div
+            className="absolute top-0 right-0 h-full w-1 cursor-col-resize z-20"
+            onPanStart={onResizeMouseDown}
+          />
+        )}
       </div>
-      
-      {/* Resizer Handle */}
-      {!isCollapsed && (
-        <div
-          onMouseDown={onResizeMouseDown}
-          onDoubleClick={onResetWidth}
-          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize z-20 group"
-          title="Drag to resize, double-click to reset"
-        >
-          <div className="w-full h-full transition-colors duration-200 group-hover:bg-blue-500/50" />
-        </div>
-      )}
     </motion.div>
   );
 }

@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   Search, 
   X, 
-  Filter,
   Calendar,
   Tag,
   FileText,
@@ -19,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Modal } from "@/components/ui/modal";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -109,188 +109,160 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+    <Modal isOpen={isOpen} onClose={onClose} position="top" className="max-w-4xl">
+      <GlassCard className="mx-4 max-h-[80vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-4 p-6 border-b border-white/20">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
+            <Input
+              placeholder="검색어를 입력하세요... (유의어 검색 지원)"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/60 text-lg h-12"
+              autoFocus
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-          />
-          
-          {/* Search Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -50 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-20 left-1/2 transform -translate-x-1/2 w-full max-w-4xl z-50"
+            className="text-white hover:bg-white/10"
           >
-            <GlassCard className="mx-4 max-h-[80vh] flex flex-col">
-              {/* Header */}
-              <div className="flex items-center gap-4 p-6 border-b border-white/20">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
-                  <Input
-                    placeholder="검색어를 입력하세요... (유의어 검색 지원)"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/60 text-lg h-12"
-                    autoFocus
-                  />
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClose}
-                  className="text-white hover:bg-white/10"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
 
-              {/* Filters */}
-              <div className="flex items-center gap-2 p-4 border-b border-white/20">
-                {filters.map(filter => {
-                  const Icon = filter.icon;
+        {/* Filters */}
+        <div className="flex items-center gap-2 p-4 border-b border-white/20">
+          {filters.map(filter => {
+            const Icon = filter.icon;
+            return (
+              <Button
+                key={filter.id}
+                variant={selectedFilter === filter.id ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setSelectedFilter(filter.id)}
+                className="text-white hover:bg-white/10"
+              >
+                <Icon className="h-4 w-4 mr-2" />
+                {filter.name}
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Content */}
+        <ScrollArea className="flex-1 max-h-96">
+          <div className="p-6">
+            {query.length === 0 ? (
+              <div className="space-y-6">
+                {/* Recent Searches */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock className="h-4 w-4 text-white/70" />
+                    <span className="text-white/80 text-sm font-medium">최근 검색</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {recentSearches.map(search => (
+                      <Button
+                        key={search}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setQuery(search)}
+                        className="border-white/30 text-white hover:bg-white/10"
+                      >
+                        {search}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator className="bg-white/20" />
+
+                {/* Popular Tags */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp className="h-4 w-4 text-white/70" />
+                    <span className="text-white/80 text-sm font-medium">인기 태그</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {popularTags.map(tag => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="bg-white/20 text-white cursor-pointer hover:bg-white/30"
+                        onClick={() => setQuery(tag)}
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : isSearching ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-white/60">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full mx-auto mb-4"
+                  />
+                  <p>검색 중...</p>
+                </div>
+              </div>
+            ) : results.length === 0 ? (
+              <div className="text-center py-12 text-white/60">
+                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>검색 결과가 없습니다</p>
+                <p className="text-sm mt-1">다른 키워드로 시도해보세요</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-white/80 text-sm">
+                  {results.length}개의 결과를 찾았습니다
+                </div>
+                {results.map(result => {
+                  const TypeIcon = getTypeIcon(result.type);
                   return (
-                    <Button
-                      key={filter.id}
-                      variant={selectedFilter === filter.id ? 'secondary' : 'ghost'}
-                      size="sm"
-                      onClick={() => setSelectedFilter(filter.id)}
-                      className="text-white hover:bg-white/10"
+                    <motion.div
+                      key={result.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 rounded-lg hover:bg-white/10 transition-colors duration-200 cursor-pointer"
                     >
-                      <Icon className="h-4 w-4 mr-2" />
-                      {filter.name}
-                    </Button>
+                      <div className="flex items-start gap-4">
+                        <div className="p-2 bg-white/10 rounded-full">
+                          <TypeIcon className="h-5 w-5 text-white/80" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-white font-medium mb-1">{result.title}</h3>
+                          <p className="text-white/70 text-sm line-clamp-2 mb-2">{result.content}</p>
+                          <div className="flex items-center justify-between text-xs text-white/50">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1.5">
+                                <Tag className="h-3 w-3" />
+                                <span>{result.tags.join(', ')}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="h-3 w-3" />
+                                <span>{result.createdAt}</span>
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="border-green-500/50 text-green-400">
+                              정확도: {result.relevance}%
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
                   );
                 })}
               </div>
-
-              {/* Content */}
-              <ScrollArea className="flex-1 max-h-96">
-                <div className="p-6">
-                  {query.length === 0 ? (
-                    <div className="space-y-6">
-                      {/* Recent Searches */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <Clock className="h-4 w-4 text-white/70" />
-                          <span className="text-white/80 text-sm font-medium">최근 검색</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {recentSearches.map(search => (
-                            <Button
-                              key={search}
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setQuery(search)}
-                              className="border-white/30 text-white hover:bg-white/10"
-                            >
-                              {search}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <Separator className="bg-white/20" />
-
-                      {/* Popular Tags */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <TrendingUp className="h-4 w-4 text-white/70" />
-                          <span className="text-white/80 text-sm font-medium">인기 태그</span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {popularTags.map(tag => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="bg-white/20 text-white cursor-pointer hover:bg-white/30"
-                              onClick={() => setQuery(tag)}
-                            >
-                              #{tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : isSearching ? (
-                    <div className="flex items-center justify-center py-12">
-                      <div className="text-white/60">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full mx-auto mb-4"
-                        />
-                        <p>검색 중...</p>
-                      </div>
-                    </div>
-                  ) : results.length === 0 ? (
-                    <div className="text-center py-12 text-white/60">
-                      <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>검색 결과가 없습니다</p>
-                      <p className="text-sm mt-1">다른 키워드로 시도해보세요</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="text-white/80 text-sm">
-                        {results.length}개의 결과를 찾았습니다
-                      </div>
-                      {results.map(result => {
-                        const TypeIcon = getTypeIcon(result.type);
-                        return (
-                          <motion.div
-                            key={result.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="p-4 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors"
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-                                <TypeIcon className="h-4 w-4 text-white/70" />
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="text-white font-medium mb-1">{result.title}</h3>
-                                <p className="text-white/70 text-sm line-clamp-2 mb-2">
-                                  {result.content}
-                                </p>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    {result.tags.map(tag => (
-                                      <Badge
-                                        key={tag}
-                                        variant="outline"
-                                        className="border-white/30 text-white/70 text-xs"
-                                      >
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                  <div className="flex items-center gap-2 text-white/50 text-xs">
-                                    <Calendar className="h-3 w-3" />
-                                    <span>{result.createdAt}</span>
-                                    <span>•</span>
-                                    <span>{result.relevance}% 일치</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </GlassCard>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            )}
+          </div>
+        </ScrollArea>
+      </GlassCard>
+    </Modal>
   );
 }
