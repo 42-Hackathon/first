@@ -30,8 +30,8 @@ export default function Index() {
   const leftSidebarWidth = useMotionValue(288);
   const [isLeftResizing, setIsLeftResizing] = useState(false);
 
-  // 우측 사이드바 리사이즈 상태
-  const rightSidebarWidth = useMotionValue(320);
+  // 우측 사이드바 리사이즈 상태 - 픽셀 값으로 관리
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(320);
   const [isRightResizing, setIsRightResizing] = useState(false);
 
   // Modal states
@@ -53,7 +53,6 @@ export default function Index() {
       
       if (newWidth >= minWidth && newWidth <= maxWidth) {
         leftSidebarWidth.set(newWidth);
-        // 70px 기준으로 collapse 상태 업데이트
         setIsLeftSidebarCollapsed(newWidth < 70);
       }
     }
@@ -66,24 +65,30 @@ export default function Index() {
   // 우측 사이드바 리사이즈 핸들러
   const handleRightResizeMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsRightResizing(true);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
   };
 
   const handleRightResizeMouseMove = useCallback((e: MouseEvent) => {
     if (isRightResizing) {
+      e.preventDefault();
       const containerWidth = window.innerWidth;
       const newWidth = containerWidth - e.clientX;
       const minWidth = 280;
       const maxWidth = 600;
       
       if (newWidth >= minWidth && newWidth <= maxWidth) {
-        rightSidebarWidth.set(newWidth);
+        setRightSidebarWidth(newWidth);
       }
     }
-  }, [isRightResizing, rightSidebarWidth]);
+  }, [isRightResizing]);
 
   const handleRightResizeMouseUp = useCallback(() => {
     setIsRightResizing(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   }, []);
 
   // 마우스 이벤트 리스너 등록/해제
@@ -121,7 +126,7 @@ export default function Index() {
   };
 
   const handleRightResetWidth = () => {
-    animate(rightSidebarWidth, 320, { type: "spring", stiffness: 400, damping: 30 });
+    setRightSidebarWidth(320);
   };
 
   const handleItemSelect = (item: ContentItem) => {
@@ -255,18 +260,20 @@ export default function Index() {
 
             {/* 우측 사이드바 */}
             {isRightSidebarOpen ? (
-              <motion.div 
-                style={{ width: rightSidebarWidth }}
-                className="relative"
+              <div 
+                className="relative flex-shrink-0"
+                style={{ width: `${rightSidebarWidth}px` }}
               >
-                {/* 우측 사이드바 리사이즈 핸들 */}
+                {/* 우측 사이드바 리사이즈 핸들 - 메인 컴포넌트에서 관리 */}
                 <div
                   onMouseDown={handleRightResizeMouseDown}
                   onDoubleClick={handleRightResetWidth}
-                  className="absolute left-0 top-0 w-1.5 h-full cursor-col-resize z-20 group"
+                  className={`absolute left-0 top-0 w-2 h-full z-30 group cursor-col-resize ${
+                    isRightResizing ? 'bg-blue-500/70' : 'hover:bg-blue-500/50'
+                  } transition-colors duration-200`}
                   title="Drag to resize, double-click to reset"
                 >
-                  <div className="w-full h-full transition-colors duration-200 group-hover:bg-blue-500/50" />
+                  <div className="w-full h-full" />
                 </div>
 
                 <EnhancedMemoSidebar 
@@ -277,7 +284,7 @@ export default function Index() {
                   zoomLevel={zoomLevel}
                   onCursorChange={(p) => setCursorPosition({lineNumber: p.line, column: p.column})}
                 />
-              </motion.div>
+              </div>
             ) : (
               <motion.div
                 initial={{ x: 20, opacity: 0 }}
