@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import { 
@@ -312,12 +311,8 @@ export function EnhancedMemoSidebar({
   }
 
   return (
-    <motion.div
+    <div
       className="h-full flex flex-col border-l border-white/[0.15] w-72 outline-none shadow-none"
-      initial={{ x: "100%" }}
-      animate={{ x: 0 }}
-      exit={{ x: "100%" }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Apple Liquid Glass Background */}
@@ -369,7 +364,7 @@ export function EnhancedMemoSidebar({
           {mode === 'memo' && (
             <div className="flex-1 flex flex-col overflow-hidden">
               {/* Editor Area - 박스 제거 */}
-              <div className="flex-1 overflow-hidden relative">
+              <div className="flex-1 overflow-hidden relative p-3">
                 <Editor
                   language={editorLanguage}
                   value={editorContent}
@@ -382,9 +377,7 @@ export function EnhancedMemoSidebar({
               
               {/* 구분선과 파일 형식 버튼 */}
               <div className="flex-shrink-0 border-t border-white/[0.15] px-3 py-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-white/60 text-xs">콘텐츠 드래그 앤 드롭</span>
-                  
+                <div className="flex items-center justify-end">
                   {/* 파일 형식 전환 버튼 */}
                   <div className="flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5">
                     <Button
@@ -422,18 +415,13 @@ export function EnhancedMemoSidebar({
                 <div className="flex flex-wrap gap-2">
                   {contentPills.map(pill => (
                     <div key={pill.id} className="group relative">
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      <div
                         className="flex items-center bg-white/10 text-white/90 text-xs rounded-full pl-2 pr-2 py-1 backdrop-blur-xl border border-white/20 cursor-pointer hover:bg-white/20"
                         onClick={() => insertPillIntoEditor(pill)}
                       >
                         <PillIcon type={pill.type} />
                         <span className="truncate max-w-[120px] mx-1">{pill.title}</span>
-                      </motion.div>
+                      </div>
                       <button 
                         onClick={() => removeContentPill(pill.id)}
                         className="absolute -top-1 -right-1 bg-red-500 rounded-full h-4 w-4 flex items-center justify-center text-white text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
@@ -462,6 +450,6 @@ export function EnhancedMemoSidebar({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
