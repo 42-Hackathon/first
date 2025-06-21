@@ -367,7 +367,8 @@ export function EnhancedMemoSidebar({
           </div>
 
           {mode === 'memo' && (
-            <div className="flex-1 flex flex-col p-3 space-y-3 overflow-hidden">
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Editor Area - 박스 제거 */}
               <div className="flex-1 overflow-hidden relative">
                 <Editor
                   language={editorLanguage}
@@ -379,12 +380,42 @@ export function EnhancedMemoSidebar({
                 />
               </div>
               
+              {/* 구분선과 파일 형식 버튼 */}
+              <div className="flex-shrink-0 border-t border-white/[0.15] px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/60 text-xs">콘텐츠 드래그 앤 드롭</span>
+                  
+                  {/* 파일 형식 전환 버튼 */}
+                  <div className="flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5">
+                    <Button
+                      onClick={() => setEditorLanguage('markdown')}
+                      variant={editorLanguage === 'markdown' ? "secondary" : "ghost"}
+                      className={`h-5 px-2 text-xs transition-all duration-200 ${
+                        editorLanguage === 'markdown' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      .md
+                    </Button>
+                    <Button
+                      onClick={() => setEditorLanguage('plaintext')}
+                      variant={editorLanguage === 'plaintext' ? "secondary" : "ghost"}
+                      className={`h-5 px-2 text-xs transition-all duration-200 ${
+                        editorLanguage === 'plaintext' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      .txt
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Pills Drop Zone */}
               <div
                 ref={dropZoneRef}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`flex-shrink-0 rounded-lg p-2 transition-colors duration-200 relative ${
+                className={`flex-shrink-0 p-3 transition-colors duration-200 relative ${
                   isDragging ? "bg-white/10" : ""
                 }`}
               >
@@ -427,29 +458,6 @@ export function EnhancedMemoSidebar({
                <div className="flex-1 rounded-lg text-white/80 text-center flex items-center justify-center">
                 AI 채팅 기능이 여기에 표시됩니다.
                </div>
-            </div>
-          )}
-
-          {mode === 'memo' && (
-            <div className="absolute bottom-1 right-1 flex items-center bg-black/30 border border-white/20 rounded-md backdrop-blur-lg p-0.5 z-30">
-              <Button
-                onClick={() => setEditorLanguage('markdown')}
-                variant={editorLanguage === 'markdown' ? "secondary" : "ghost"}
-                className={`h-5 px-2 text-xs transition-all duration-200 ${
-                  editorLanguage === 'markdown' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
-                }`}
-              >
-                .md
-              </Button>
-              <Button
-                onClick={() => setEditorLanguage('plaintext')}
-                variant={editorLanguage === 'plaintext' ? "secondary" : "ghost"}
-                className={`h-5 px-2 text-xs transition-all duration-200 ${
-                  editorLanguage === 'plaintext' ? 'bg-white/[0.2] text-white shadow-md' : 'text-white/70 hover:text-white'
-                }`}
-              >
-                .txt
-              </Button>
             </div>
           )}
         </div>
