@@ -27,8 +27,8 @@ interface ContentGridHeaderProps {
 function ContentGridHeader({
   folderName,
   itemCount,
-  viewMode,
-  onViewModeChange,
+  viewMode, 
+  onViewModeChange, 
   scale
 }: ContentGridHeaderProps) {
   return (
@@ -263,13 +263,13 @@ function ContentItemCard({
           >
             <Button variant="ghost" size="icon" className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20">
               <Star className="w-3 h-3 text-zinc-600 dark:text-zinc-300" />
-            </Button>
+          </Button>
             <Button variant="ghost" size="icon" className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20">
               <Share2 className="w-3 h-3 text-zinc-600 dark:text-zinc-300" />
-            </Button>
+          </Button>
             <Button variant="ghost" size="icon" className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20">
               <MoreHorizontal className="w-3 h-3 text-zinc-600 dark:text-zinc-300" />
-            </Button>
+          </Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -297,8 +297,8 @@ function ContentItemCard({
               <div className="flex items-center gap-1">
                 <Calendar style={{width: `${scale(12)}px`, height: `${scale(12)}px`}} />
                 <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
+        </div>
+      </div>
 
             {item.tags && (
               <div className="flex gap-1">

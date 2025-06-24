@@ -1,8 +1,52 @@
-export interface ContentItem {
+export type ContentItem = 
+  | {
+      id: string;
+      title: string;
+      content: string;
+      type: 'text';
+      stage: 'review' | 'refine' | 'consolidate';
+      tags: string[];
+      folderId?: string;
+      createdAt: string;
+      updatedAt: string;
+      metadata?: Record<string, never>;
+    }
+  | {
+      id: string;
+      title: string;
+      content: string;
+      type: 'image';
+      stage: 'review' | 'refine' | 'consolidate';
+      tags: string[];
+      folderId?: string;
+      createdAt: string;
+      updatedAt: string;
+      metadata: {
+        imageUrl: string;
+        fileSize?: number;
+        dimensions?: { width: number; height: number };
+      };
+    }
+  | {
+      id: string;
+      title: string;
+      content: string;
+      type: 'link';
+      stage: 'review' | 'refine' | 'consolidate';
+      tags: string[];
+      folderId?: string;
+      createdAt: string;
+      updatedAt: string;
+      metadata: {
+        url: string;
+        hostname?: string;
+      };
+    }
+  | {
   id: string;
   title: string;
   content: string;
-  type: 'text' | 'image' | 'link' | 'file' | 'video';
+      type: 'file' | 'video';
   stage: 'review' | 'refine' | 'consolidate';
   tags: string[];
   folderId?: string;
@@ -11,11 +55,8 @@ export interface ContentItem {
   metadata?: {
     url?: string;
     fileSize?: number;
-    dimensions?: { width: number; height: number };
-    author?: string;
-    views?: number;
+      };
   };
-}
 
 export interface Folder {
   id: string;
